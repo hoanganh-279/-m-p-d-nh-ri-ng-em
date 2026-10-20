@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import {
+  getPlaylistTrackIndex,
+  subscribeTrackIndex,
+  syncPlaylistPlayback,
+} from '../audio/playlistController'
 import { playlist } from '../data/playlist'
 import { useExperienceStore } from '../store/useExperienceStore'
 
@@ -12,46 +17,18 @@ type MusicDockProps = {
 function usePlaylistAudio() {
   const musicOn = useExperienceStore((s) => s.musicOn)
   const toggleMusic = useExperienceStore((s) => s.toggleMusic)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [trackIndex, setTrackIndex] = useState(0)
+  const [trackIndex, setTrackIndex] = useState(getPlaylistTrackIndex)
   const [missing, setMissing] = useState(false)
   const track = playlist[trackIndex]
 
-  useEffect(() => {
-    const audio = new Audio()
-    audio.preload = 'none'
-    audio.loop = false
-    audio.volume = 0.55
-    audioRef.current = audio
-
-    const onEnded = () => {
-      setTrackIndex((i) => (i + 1) % playlist.length)
-    }
-    audio.addEventListener('ended', onEnded)
-    return () => {
-      audio.pause()
-      audio.removeEventListener('ended', onEnded)
-      audioRef.current = null
-    }
-  }, [])
+  useEffect(() => subscribeTrackIndex(setTrackIndex), [])
 
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    audio.src = track.src
     setMissing(false)
-
-    if (musicOn) {
-      audio
-        .play()
-        .then(() => setMissing(false))
-        .catch(() => {
-          setMissing(true)
-          useExperienceStore.getState().toggleMusic()
-        })
-    } else {
-      audio.pause()
-    }
+    void syncPlaylistPlayback(musicOn, trackIndex).then(
+      () => setMissing(false),
+      () => setMissing(true),
+    )
   }, [track.src, musicOn, trackIndex])
 
   const playTrack = (index: number) => {

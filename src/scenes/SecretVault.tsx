@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { SECRET_PIN, secretItems, type SecretItem } from '../data/secrets'
+import { SECRET_PIN } from '../data/secrets'
 import { useExperienceStore } from '../store/useExperienceStore'
+import { SecretPhotobooth } from './SecretPhotobooth'
 
 export function SecretVault() {
   const scene = useExperienceStore((s) => s.scene)
@@ -15,7 +16,6 @@ export function SecretVault() {
   const [unlocked, setUnlocked] = useState(false)
   const [pin, setPin] = useState('')
   const [error, setError] = useState(false)
-  const [active, setActive] = useState<SecretItem | null>(null)
 
   // Mỗi lần đóng / thoát → khóa lại, lần sau phải nhập PIN
   useEffect(() => {
@@ -23,7 +23,6 @@ export function SecretVault() {
       setUnlocked(false)
       setPin('')
       setError(false)
-      setActive(null)
     }
   }, [open])
 
@@ -39,14 +38,11 @@ export function SecretVault() {
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (active) setActive(null)
-        else closeSecret()
-      }
+      if (e.key === 'Escape') closeSecret()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open, active, closeSecret])
+  }, [open, closeSecret])
 
   const submitPin = () => {
     if (pin === SECRET_PIN) {
@@ -83,7 +79,7 @@ export function SecretVault() {
       onClick={closeSecret}
     >
       <div
-        className="secret-panel relative flex max-h-[min(88vh,720px)] w-full max-w-lg flex-col overflow-hidden bg-surface text-ink"
+        className="secret-panel relative flex max-h-[min(90vh,760px)] w-full max-w-3xl flex-col overflow-hidden bg-surface text-ink"
         data-ui
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -108,7 +104,10 @@ export function SecretVault() {
           </button>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-5" style={{ touchAction: 'pan-y' }}>
+        <div
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-5"
+          style={{ touchAction: 'pan-y' }}
+        >
           {!unlocked ? (
             <div ref={pinBox} className="mx-auto flex max-w-xs flex-col items-center gap-4 py-6">
               <p className="text-center text-sm text-ink/75">
@@ -147,134 +146,9 @@ export function SecretVault() {
               </button>
             </div>
           ) : (
-            <SecretGallery items={secretItems} onOpen={setActive} />
+            <SecretPhotobooth />
           )}
         </div>
-      </div>
-
-      {active && (
-        <SecretViewer item={active} onClose={() => setActive(null)} />
-      )}
-    </div>
-  )
-}
-
-function SecretGallery({
-  items,
-  onOpen,
-}: {
-  items: SecretItem[]
-  onOpen: (item: SecretItem) => void
-}) {
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col gap-3 py-4 text-sm text-ink/75">
-        <p className="text-base text-ink">Hộp quà đang chờ được lấp đầy.</p>
-        <p>
-          Thêm ảnh (webp/jpg/png) hoặc video (mp4) vào thư mục{' '}
-          <code className="text-blush">public/secrets/</code>, rồi khai báo trong{' '}
-          <code className="text-blush">src/data/secrets.ts</code>.
-        </p>
-        <pre className="overflow-x-auto bg-ground p-3 text-xs leading-relaxed text-ink/80">
-{`{
-  id: '1',
-  type: 'image',
-  src: '/secrets/ten-file.webp',
-  title: 'Quà nhỏ',
-  caption: 'Ghi chú…'
-}`}
-        </pre>
-      </div>
-    )
-  }
-
-  return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3">
-      {items.map((item) => (
-        <li key={item.id}>
-          <button
-            type="button"
-            onClick={() => onOpen(item)}
-            className="group relative aspect-square w-full overflow-hidden bg-ground text-left"
-          >
-            {item.type === 'video' ? (
-              <>
-                {item.poster ? (
-                  <img
-                    src={item.poster}
-                    alt=""
-                    className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-ground text-ink/50">
-                    Video
-                  </div>
-                )}
-                <span className="absolute bottom-2 right-2 bg-accent px-2 py-0.5 text-xs font-semibold">
-                  ▶
-                </span>
-              </>
-            ) : (
-              <img
-                src={item.src}
-                alt={item.title}
-                className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
-                loading="lazy"
-              />
-            )}
-            <span className="absolute inset-x-0 bottom-0 bg-ground/75 px-2 py-1.5 text-xs font-medium text-ink">
-              {item.title}
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-function SecretViewer({ item, onClose }: { item: SecretItem; onClose: () => void }) {
-  return (
-    <div
-      className="absolute inset-0 z-[60] flex items-center justify-center bg-ground/92 p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-label={item.title}
-    >
-      <div
-        className="relative max-h-[90vh] w-full max-w-3xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute -top-12 right-0 min-h-11 bg-white/10 px-4 text-sm md:right-0"
-        >
-          Đóng
-        </button>
-        {item.type === 'video' ? (
-          <video
-            src={item.src}
-            poster={item.poster}
-            controls
-            autoPlay
-            playsInline
-            className="max-h-[80vh] w-full bg-ground"
-          />
-        ) : (
-          <img
-            src={item.src}
-            alt={item.title}
-            className="max-h-[80vh] w-full object-contain"
-          />
-        )}
-        {(item.title || item.caption) && (
-          <div className="mt-3 text-center">
-            <p className="font-semibold text-ink">{item.title}</p>
-            {item.caption ? (
-              <p className="mt-1 text-sm text-ink/70">{item.caption}</p>
-            ) : null}
-          </div>
-        )}
       </div>
     </div>
   )

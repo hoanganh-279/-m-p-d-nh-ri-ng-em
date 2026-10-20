@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
+import { startRandomMusic } from '../audio/playlistController'
 import { memories } from '../data/memories'
 import { recipientName } from '../data/letter'
 import { useExperienceStore } from '../store/useExperienceStore'
@@ -47,6 +48,9 @@ export function Intro() {
   )
 
   const onExplore = () => {
+    // Start inside the click gesture so the browser allows autoplay.
+    startRandomMusic()
+
     if (!root.current || reducedMotion) {
       enterExperience()
       return
