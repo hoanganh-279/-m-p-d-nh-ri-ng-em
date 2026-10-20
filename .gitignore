@@ -1,0 +1,12 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vscode/*
+!.vscode/extensions.json
+.env
+.env.*
+.taste-skill/
+.agents/
+img/
+*.log

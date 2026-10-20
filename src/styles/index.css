@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --galaxy: #03020a;
+  --ground: #03020a;
+  --ink: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --rose: #f26b9b;
+  --accent: #f26b9b;
+  --paper: #fff6fa;
+  --paper-ink: #1a1218;
+  --blush: #ffd6e5;
+  --champagne: #f4d9a6;
+  --white: #ffffff;
+  --surface: #141018;
+  --radius: 0px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(242, 107, 155, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-kenburns {
+    animation: intro-kenburns 18s ease-in-out alternate infinite;
+  }
+}
+
+@keyframes intro-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+/* Intro decoration mascots — above scrim, below copy/CTA */
+.intro-mascots {
+  z-index: 7;
+}
+
+.intro-mascot {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.intro-mascot-twinkle {
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: 0.35rem;
+  width: 108px;
+  height: 108px;
+}
+
+.intro-mascot-stitch {
+  right: 0.2rem;
+  /* Sit on the upper edge of the bottom scrim — clear of CTA */
+  bottom: max(11.5rem, 36%);
+  width: 124px;
+  height: 124px;
+}
+
+.stitch-heart-fly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 0;
+  will-change: transform, opacity;
+}
+
+@media (min-width: 768px) {
+  .intro-mascot-twinkle {
+    top: max(1.25rem, env(safe-area-inset-top));
+    left: 1.25rem;
+    width: 148px;
+    height: 148px;
+  }
+
+  .intro-mascot-stitch {
+    right: 1.25rem;
+    bottom: 38%;
+    width: 168px;
+    height: 168px;
+  }
+}
+
+/* Stationery letter sheet — opaque paper over WebGL */
+.letter-sheet {
+  position: relative;
+  display: flex;
+  max-height: 88vh;
+  width: 100%;
+  max-width: 42rem;
+  flex-direction: column;
+  background-color: var(--paper);
+  color: var(--paper-ink);
+  overflow: hidden;
+}
+
+.letter-fold {
+  position: relative;
+  height: 14px;
+  flex-shrink: 0;
+  background-color: var(--blush);
+}
+
+.letter-fold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 28px 14px 0;
+  border-color: transparent var(--paper) transparent transparent;
+  /* visual: folded corner over blush strip */
+  filter: brightness(0.97);
+}
+
+.letter-sheet-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background-color: var(--blush);
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .letter-sheet-footer {
+    padding: 1rem 2rem;
+  }
+}
