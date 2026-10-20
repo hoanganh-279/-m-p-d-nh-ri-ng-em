@@ -138,9 +138,131 @@ input:focus-visible {
   }
 }
 
+/* Envelope stage — closed card before letter opens */
+.envelope-stage {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 22rem;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+}
+
+.envelope-stage.is-opening,
+.envelope-stage.is-reading {
+  max-width: 42rem;
+}
+
+.envelope {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 22rem);
+  aspect-ratio: 7 / 5;
+  margin-inline: auto;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.envelope:hover:not(.is-opening):not(.is-opened) {
+  transform: scale(1.02);
+}
+
+.envelope:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+}
+
+.envelope.is-opening,
+.envelope.is-opened {
+  cursor: default;
+  pointer-events: none;
+}
+
+.envelope-body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--blush);
+}
+
+.envelope-pocket {
+  position: absolute;
+  inset: 0;
+  background-color: #ffc4d8;
+  clip-path: polygon(0 28%, 50% 58%, 100% 28%, 100% 100%, 0 100%);
+}
+
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 100%;
+  height: 58%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  background-color: #ffd0e2;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  will-change: transform;
+}
+
+.envelope-seal {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  z-index: 4;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background-color: var(--accent);
+  color: var(--white);
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.envelope-seal svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.envelope-label {
+  position: absolute;
+  right: 0;
+  bottom: 14%;
+  left: 0;
+  z-index: 5;
+  padding: 0 1rem;
+  text-align: center;
+  color: var(--paper-ink);
+  pointer-events: none;
+}
+
+.envelope-label strong {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.envelope-label span {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  opacity: 0.72;
+}
+
 /* Stationery letter sheet — opaque paper over WebGL */
 .letter-sheet {
   position: relative;
+  z-index: 6;
   display: flex;
   max-height: 88vh;
   width: 100%;
@@ -149,6 +271,34 @@ input:focus-visible {
   background-color: var(--paper);
   color: var(--paper-ink);
   overflow: hidden;
+}
+
+.letter-rise {
+  width: 100%;
+}
+
+.envelope-stage.is-opening .letter-rise {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  width: min(100vw - 1.5rem, 42rem);
+  transform: translate(-50%, -42%);
+}
+
+.envelope-stage.is-reading:not(.is-opening) .letter-rise {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 100%;
+  transform: none;
+}
+
+.envelope-stage:not(.is-opening):not(.is-reading) .letter-rise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .letter-fold {
@@ -185,5 +335,17 @@ input:focus-visible {
 @media (min-width: 768px) {
   .letter-sheet-footer {
     padding: 1rem 2rem;
+  }
+
+  .envelope-stage:not(.is-opening):not(.is-reading) {
+    max-width: 26rem;
+  }
+
+  .envelope {
+    width: min(100%, 26rem);
+  }
+
+  .envelope-label strong {
+    font-size: 2.15rem;
   }
 }
